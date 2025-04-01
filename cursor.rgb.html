@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cursor Mágico RGB</title>
+  <style>
+    /* FONDO OSCURO */
+    body {
+      background-color: #000;
+      margin: 0;
+      overflow: hidden;
+      cursor: none;
+    }
+    
+    /* CURSOR RGB BRILLANTE */
+    .cursor {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: screen;
+      filter: 
+        drop-shadow(0 0 10px #fff)
+        drop-shadow(0 0 20px #0ff)
+        drop-shadow(0 0 30px #f0f)
+        drop-shadow(0 0 40px #ff0);
+      background: radial-gradient(
+        circle,
+        rgba(255, 0, 255, 0.9) 0%,
+        rgba(0, 255, 255, 0.9) 50%,
+        rgba(255, 255, 0, 0.9) 100%
+      );
+      transform: translate(-50%, -50%);
+    }
+    
+    /* PARTÍCULAS DE ESCARCHA */
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      pointer-events: none;
+      background: white;
+      mix-blend-mode: screen;
+      filter: drop-shadow(0 0 5px cyan);
+      opacity: 0.8;
+      animation: fall 2s linear forwards;
+    }
+    
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor"></div>
+  
+  <script>
+    const cursor = document.querySelector('.cursor');
+    const colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff6600', '#00ff66'];
+    
+    // SEGUIR MOVIMIENTO DEL MOUSE
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = `${e.clientX}px`;
+      cursor.style.top = `${e.clientY}px`;
+      
+      // CAMBIO DE COLOR DINÁMICO
+      const hue = (e.clientX / window.innerWidth) * 360;
+      cursor.style.background = `
+        radial-gradient(
+          circle,
+          hsla(${hue}, 100%, 50%, 0.9),
+          hsla(${hue + 120}, 100%, 50%, 0.9),
+          hsla(${hue + 240}, 100%, 50%, 0.9)
+        )`;
+      
+      // CREAR PARTÍCULAS DE ESCARCHA
+      createParticles(e.clientX, e.clientY);
+    });
+    
+    // GENERADOR DE PARTÍCULAS
+    function createParticles(x, y) {
+      for (let i = 0; i < 5; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // POSICIÓN ALEATORIA CERCA DEL CURSOR
+        particle.style.left = `${x + (Math.random() * 20 - 10)}px`;
+        particle.style.top = `${y + (Math.random() * 20 - 10)}px`;
+        
+        // COLOR ALEATORIO BRILLANTE
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.filter = `drop-shadow(0 0 5px ${colors[Math.floor(Math.random() * colors.length)]})`;
+        
+        // TAMAÑO ALEATORIO
+        const size = Math.random() * 8 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // DURACIÓN ALEATORIA
+        particle.style.animationDuration = `${Math.random() * 1 + 1}s`;
+        
+        document.body.appendChild(particle);
+        
+        // ELIMINAR PARTÍCULA DESPUÉS DE LA ANIMACIÓN
+        setTimeout(() => {
+          particle.remove();
+        }, 2000);
+      }
+    }
+  </script>
+</body>
+</html>
